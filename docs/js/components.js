@@ -1,12 +1,12 @@
 export class SearchableDropdown {
-    constructor(containerId, placeholder, onSelect) {
+    constructor(containerId, placeholder, onSelect, onOpenCallback = null) {
         this.container = document.getElementById(containerId);
         this.placeholder = placeholder;
         this.onSelect = onSelect;
+        this.onOpenCallback = onOpenCallback;
         this.options = [];
         this.selectedValue = null;
         this.isOpen = false;
-
         this.build();
         this.bindEvents();
     }
@@ -25,7 +25,6 @@ export class SearchableDropdown {
                 <ul class="dropdown-options"></ul>
             </div>
         `;
-        
         this.header = this.container.querySelector('.dropdown-header');
         this.selectedText = this.container.querySelector('.dropdown-selected-text');
         this.menu = this.container.querySelector('.dropdown-menu');
@@ -38,13 +37,10 @@ export class SearchableDropdown {
             e.stopPropagation();
             this.toggle();
         });
-
         this.searchInput.addEventListener('input', (e) => {
             this.filterOptions(e.target.value);
         });
-
         this.searchInput.addEventListener('click', (e) => e.stopPropagation());
-
         document.addEventListener('click', (e) => {
             if (this.isOpen && !this.container.contains(e.target)) {
                 this.close();
@@ -60,11 +56,9 @@ export class SearchableDropdown {
     filterOptions(query) {
         this.optionsList.innerHTML = '';
         const q = query.toLowerCase().trim();
-        
         const filtered = this.options.filter(opt => 
             opt.toLowerCase().includes(q)
         );
-
         if (filtered.length === 0) {
             const li = document.createElement('li');
             li.textContent = "Sin resultados";
@@ -73,12 +67,10 @@ export class SearchableDropdown {
             this.optionsList.appendChild(li);
             return;
         }
-
         filtered.forEach(opt => {
             const li = document.createElement('li');
             li.textContent = opt;
             if (opt === this.selectedValue) li.classList.add('selected');
-            
             li.addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.select(opt);
@@ -101,9 +93,12 @@ export class SearchableDropdown {
         this.selectedText.textContent = this.placeholder;
     }
 
-    toggle() { this.isOpen ? this.close() : this.open(); }
+    toggle() { 
+        this.isOpen ? this.close() : this.open(); 
+    }
 
     open() {
+        if (this.onOpenCallback) this.onOpenCallback();
         this.isOpen = true;
         this.container.classList.add('open');
         setTimeout(() => this.searchInput.focus(), 10);
