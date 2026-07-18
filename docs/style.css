@@ -21,9 +21,22 @@ header {
     padding: 12px 24px;
     flex-shrink: 0;
     z-index: 10;
+    text-align: center; /* Centrado del título */
 }
 
-header h1 { margin: 0; font-size: 1.2rem; font-weight: 500; }
+header h1 { 
+    margin: 0; 
+    font-size: 1.4rem; 
+    font-weight: 500; 
+}
+
+#subtitle {
+    margin: 5px 0 0 0;
+    font-size: 0.85rem;
+    color: #bdc3c7; /* Gris claro para resaltar sobre el header oscuro */
+    font-weight: 300;
+    letter-spacing: 0.5px;
+}
 
 .controls {
     display: flex;
@@ -139,12 +152,18 @@ header h1 { margin: 0; font-size: 1.2rem; font-weight: 500; }
 .legend h4 { margin: 0 0 10px 0; font-size: 13px; color: #444; }
 
 .legend-item { display: flex; align-items: center; margin-bottom: 6px; }
-.color-box { width: 16px; height: 16px; margin-right: 8px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.1); }
+.color-box { 
+    width: 16px; 
+    height: 16px; 
+    margin-right: 8px; 
+    border-radius: 3px; 
+    border: 1px solid #aaa; /* Borde oscuro para distinguir colores claros */
+}
 
 .size-item { display: flex; align-items: center; margin-bottom: 8px; }
 .size-item .circle {
-    background: rgba(100, 100, 100, 0.5);
-    border: 1px solid #555;
+    background: rgba(230, 126, 34, 0.6); /* Naranja semi-transparente para mejor visibilidad */
+    border: 1px solid #d35400;
     border-radius: 50%;
     margin-right: 10px;
 }
@@ -161,7 +180,8 @@ header h1 { margin: 0; font-size: 1.2rem; font-weight: 500; }
 @media (max-width: 768px) {
     .controls { flex-direction: column; gap: 10px; padding: 10px; }
     .dropdown-container { width: 100%; min-width: auto; }
-    header h1 { font-size: 1rem; }
+    header h1 { font-size: 1.1rem; }
+    #subtitle { font-size: 0.75rem; }
     .legend { font-size: 11px; padding: 8px 10px; }
     .variation-legend, .size-legend { bottom: 10px; }
 }
