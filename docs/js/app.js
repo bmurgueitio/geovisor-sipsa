@@ -16,6 +16,7 @@ class GeoVisor {
         this.map = null;
         this.popup = null;
         this.isPopupFixed = false;
+        this.mapReady = false; // Bandera para controlar si el mapa está listo para renderizar
 
         this.dropdownGrupo = null;
         this.dropdownSubgrupo = null;
@@ -50,10 +51,10 @@ class GeoVisor {
                     'carto-positron': {
                         type: 'raster',
                         tiles: [
-                            'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
-                            'https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
-                            'https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
-                            'https://d.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png'
+                            'https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png',
+                            'https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png',
+                            'https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png',
+                            'https://d.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png'
                         ],
                         tileSize: 256
                     }
@@ -67,6 +68,8 @@ class GeoVisor {
         this.map.addControl(new maplibregl.NavigationControl(), 'top-left');
 
         this.map.on('load', () => {
+            this.mapReady = true; // El mapa ya puede recibir datos
+            
             this.map.addSource('plazas', {
                 type: 'geojson',
                 data: { type: 'FeatureCollection', features: [] }
@@ -77,7 +80,7 @@ class GeoVisor {
                 type: 'circle',
                 source: 'plazas',
                 paint: {
-                    'circle-radius': 8, // Se actualizará dinámicamente
+                    'circle-radius': 8,
                     'circle-color': '#ccc',
                     'circle-stroke-width': 1,
                     'circle-stroke-color': '#fff'
@@ -150,6 +153,7 @@ class GeoVisor {
             this.onGrupoChange(val);
         });
         this.dropdownGrupo.setOptions(grupos);
+        // BUG 2 FIX: Eliminado el auto-select del primer grupo
 
         this.dropdownSubgrupo = new SearchableDropdown('dropdown-subgrupo', 'Seleccione Subgrupo', (val) => {
             this.onSubgrupoChange(val);
@@ -158,8 +162,6 @@ class GeoVisor {
         this.dropdownProducto = new SearchableDropdown('dropdown-producto', 'Seleccione Producto', (val) => {
             this.onProductoChange(val);
         });
-
-        if (grupos.length > 0) this.dropdownGrupo.select(grupos[0]);
     }
 
     onGrupoChange(grupo) {
@@ -171,7 +173,9 @@ class GeoVisor {
         if (gData) {
             const subgrupos = gData.subgrupos.map(s => s.nombre);
             this.dropdownSubgrupo.setOptions(subgrupos);
-            if (subgrupos.length > 0) this.dropdownSubgrupo.select(subgrupos[0]);
+            // BUG 2 FIX: Eliminado el auto-select del primer subgrupo
+        } else {
+            this.dropdownSubgrupo.setOptions([]);
         }
     }
 
@@ -185,12 +189,21 @@ class GeoVisor {
             if (sData) {
                 const productos = sData.productos.map(p => p.nombre);
                 this.dropdownProducto.setOptions(productos);
-                if (productos.length > 0) this.dropdownProducto.select(productos[0]);
+                // BUG 2 FIX: Eliminado el auto-select del primer producto
+            } else {
+                this.dropdownProducto.setOptions([]);
             }
+        } else {
+            this.dropdownProducto.setOptions([]);
         }
     }
 
     onProductoChange(productoNombre) {
+        if (!productoNombre) {
+            this.clearMap();
+            return;
+        }
+
         const gData = this.data.grupos.find(g => g.nombre === this.dropdownGrupo.selectedValue);
         const sData = gData?.subgrupos.find(s => s.nombre === this.dropdownSubgrupo.selectedValue);
         const pData = sData?.productos.find(p => p.nombre === productoNombre);
@@ -205,6 +218,11 @@ class GeoVisor {
     }
 
     renderPlazas(plazas) {
+        // BUG 1 FIX: Verificar si el mapa y sus fuentes están listos antes de renderizar
+        if (!this.mapReady || !this.map.getSource('plazas')) {
+            return; 
+        }
+
         if (plazas.length === 0) {
             this.showOverlayMessage("No hay datos disponibles para este producto");
             return;
@@ -229,7 +247,6 @@ class GeoVisor {
         this.map.getSource('plazas').setData(geojson);
 
         const rMin = 8, rMax = 30;
-        const diff = maxP - minP || 1;
 
         this.map.setPaintProperty('plazas-layer', 'circle-radius', [
             'interpolate', ['linear'], ['get', 'precio_reciente'],
@@ -277,7 +294,8 @@ class GeoVisor {
     }
 
     clearMap() {
-        if (this.map.getSource('plazas')) {
+        // BUG 1 FIX: Solo limpiar si la fuente ya fue creada
+        if (this.mapReady && this.map.getSource('plazas')) {
             this.map.getSource('plazas').setData({ type: 'FeatureCollection', features: [] });
         }
         this.hideOverlayMessage();
