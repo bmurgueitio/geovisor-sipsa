@@ -16,7 +16,7 @@ class GeoVisor {
         this.map = null;
         this.popup = null;
         this.isPopupFixed = false;
-        this.mapReady = false; // Bandera para controlar si el mapa está listo para renderizar
+        this.mapReady = false; 
 
         this.dropdownGrupo = null;
         this.dropdownSubgrupo = null;
@@ -33,12 +33,25 @@ class GeoVisor {
             if (!response.ok) throw new Error('Error al cargar JSON');
             this.data = await response.json();
             
+            this.updateSubtitle(); // Actualizar fechas dinámicamente
+            
             this.initMap();
             this.initDropdowns();
             this.hideLoading();
         } catch (err) {
             console.error(err);
             this.showError("No se pudieron cargar los datos. Verifique que data/data.json exista.");
+        }
+    }
+    
+    updateSubtitle() {
+        if (this.data && this.data.metadata) {
+            const el = document.getElementById('subtitle');
+            if (el) {
+                const fAnt = this.data.metadata.fecha_anterior;
+                const fRec = this.data.metadata.fecha_reciente;
+                el.textContent = `Comparación de precios: ${fAnt} vs ${fRec}`;
+            }
         }
     }
 
@@ -48,18 +61,18 @@ class GeoVisor {
             style: {
                 version: 8,
                 sources: {
-                    'carto-positron': {
+                    'carto-dark': { // Cambio a mapa oscuro
                         type: 'raster',
                         tiles: [
-                            'https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png',
-                            'https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png',
-                            'https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png',
-                            'https://d.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png'
+                            'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+                            'https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+                            'https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+                            'https://d.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png'
                         ],
                         tileSize: 256
                     }
                 },
-                layers: [{ id: 'carto-positron', type: 'raster', source: 'carto-positron' }]
+                layers: [{ id: 'carto-dark', type: 'raster', source: 'carto-dark' }]
             },
             center: [-74.0, 4.5],
             zoom: 5
@@ -68,7 +81,7 @@ class GeoVisor {
         this.map.addControl(new maplibregl.NavigationControl(), 'top-left');
 
         this.map.on('load', () => {
-            this.mapReady = true; // El mapa ya puede recibir datos
+            this.mapReady = true; 
             
             this.map.addSource('plazas', {
                 type: 'geojson',
@@ -81,7 +94,7 @@ class GeoVisor {
                 source: 'plazas',
                 paint: {
                     'circle-radius': 8,
-                    'circle-color': '#ccc',
+                    'circle-color': '#e67e22', // Naranja medio visible en fondo oscuro
                     'circle-stroke-width': 1,
                     'circle-stroke-color': '#fff'
                 }
@@ -153,7 +166,6 @@ class GeoVisor {
             this.onGrupoChange(val);
         });
         this.dropdownGrupo.setOptions(grupos);
-        // BUG 2 FIX: Eliminado el auto-select del primer grupo
 
         this.dropdownSubgrupo = new SearchableDropdown('dropdown-subgrupo', 'Seleccione Subgrupo', (val) => {
             this.onSubgrupoChange(val);
@@ -173,7 +185,6 @@ class GeoVisor {
         if (gData) {
             const subgrupos = gData.subgrupos.map(s => s.nombre);
             this.dropdownSubgrupo.setOptions(subgrupos);
-            // BUG 2 FIX: Eliminado el auto-select del primer subgrupo
         } else {
             this.dropdownSubgrupo.setOptions([]);
         }
@@ -189,7 +200,6 @@ class GeoVisor {
             if (sData) {
                 const productos = sData.productos.map(p => p.nombre);
                 this.dropdownProducto.setOptions(productos);
-                // BUG 2 FIX: Eliminado el auto-select del primer producto
             } else {
                 this.dropdownProducto.setOptions([]);
             }
@@ -218,7 +228,6 @@ class GeoVisor {
     }
 
     renderPlazas(plazas) {
-        // BUG 1 FIX: Verificar si el mapa y sus fuentes están listos antes de renderizar
         if (!this.mapReady || !this.map.getSource('plazas')) {
             return; 
         }
@@ -246,7 +255,8 @@ class GeoVisor {
         const geojson = { type: 'FeatureCollection', features };
         this.map.getSource('plazas').setData(geojson);
 
-        const rMin = 8, rMax = 30;
+        // Reducción del tamaño máximo de 30 a 20
+        const rMin = 6, rMax = 20; 
 
         this.map.setPaintProperty('plazas-layer', 'circle-radius', [
             'interpolate', ['linear'], ['get', 'precio_reciente'],
@@ -263,7 +273,7 @@ class GeoVisor {
             '2% a 6%', colores['2% a 6%'],
             '6% a 10%', colores['6% a 10%'],
             '> 10%', colores['> 10%'],
-            '#ccc'
+            '#7f8c8d' // Color gris azulado de fallback (más oscuro)
         ]);
 
         this.updateSizeLegend(minP, medP, maxP, rMin, rMax);
@@ -294,7 +304,6 @@ class GeoVisor {
     }
 
     clearMap() {
-        // BUG 1 FIX: Solo limpiar si la fuente ya fue creada
         if (this.mapReady && this.map.getSource('plazas')) {
             this.map.getSource('plazas').setData({ type: 'FeatureCollection', features: [] });
         }
