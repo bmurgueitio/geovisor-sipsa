@@ -3,55 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌾 Geovisor de precios - Variación semanal</title>
-    <link href="https://unpkg.com/maplibre-gl@3/dist/maplibre-gl.css" rel="stylesheet" />
+    <title>Geovisor de Precios Agrícolas</title>
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css">
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
     <header>
-        <h1>🌾 Geovisor de precios - Variación semanal</h1>
+        <h1>🌾 Geovisor de Precios Agrícolas – Variación Semanal</h1>
+        <p id="subtitle">Seleccione un producto para ver su variación</p>
     </header>
 
     <div class="controls">
-        <div id="dropdown-grupo" class="dropdown-container"></div>
-        <div id="dropdown-subgrupo" class="dropdown-container"></div>
-        <div id="dropdown-producto" class="dropdown-container"></div>
+        <div class="dropdown-container" id="dropdown-grupo"></div>
+        <div class="dropdown-container" id="dropdown-subgrupo"></div>
+        <div class="dropdown-container" id="dropdown-producto"></div>
+        <button id="filter-btn" class="filter-btn" title="Filtrar plazas">🔍 Filtrar</button>
+    </div>
+
+    <div id="dashboard" class="dashboard" style="display: none;">
+        <div class="metric metric-avg">
+            <div class="metric-label">Precio Promedio</div>
+            <div class="metric-value" id="metric-avg-value">-</div>
+        </div>
+        <div class="metric metric-trend">
+            <div class="metric-label">Tendencia Semanal</div>
+            <div class="metric-value" id="metric-trend-value">-</div>
+        </div>
+        <div class="metric metric-max-up">
+            <div class="metric-label">Mayor Subida</div>
+            <div class="metric-value" id="metric-max-up-value">-</div>
+        </div>
+        <div class="metric metric-max-down">
+            <div class="metric-label">Mayor Bajada</div>
+            <div class="metric-value" id="metric-max-down-value">-</div>
+        </div>
+        <div class="metric metric-min-price">
+            <div class="metric-label">Plaza Más Barata</div>
+            <div class="metric-value" id="metric-min-price-value">-</div>
+        </div>
+        <div class="metric metric-max-price">
+            <div class="metric-label">Plaza Más Cara</div>
+            <div class="metric-value" id="metric-max-price-value">-</div>
+        </div>
+    </div>
+
+    <div id="filter-panel" class="filter-panel" style="display: none;">
+        <div class="filter-header">
+            <h4>Filtrar Plazas</h4>
+            <button class="filter-close-btn" id="filter-close-btn">✕</button>
+        </div>
+        <div class="filter-actions">
+            <button id="select-all-btn" class="filter-action-btn">Seleccionar Todas</button>
+            <button id="deselect-all-btn" class="filter-action-btn">Deseleccionar Todas</button>
+        </div>
+        <div id="filter-checkboxes" class="filter-checkboxes"></div>
     </div>
 
     <div id="map-container">
         <div id="map"></div>
         <div id="loading-message" class="map-overlay">Cargando datos...</div>
-        <div id="error-message" class="map-overlay" style="display: none;"></div>
+        <div id="error-message" class="map-overlay" style="display: none; color: #b2182b;"></div>
+        
+        <div class="legend variation-legend">
+            <h4>Variación de Precio</h4>
+            <div class="legend-item"><span class="color-box" style="background: #b2182b;"></span> &lt; -10%</div>
+            <div class="legend-item"><span class="color-box" style="background: #ef8a62;"></span> -10% a -6%</div>
+            <div class="legend-item"><span class="color-box" style="background: #fddbc7;"></span> -6% a -2%</div>
+            <div class="legend-item"><span class="color-box" style="background: #f5f5f5;"></span> -2% a 2%</div>
+            <div class="legend-item"><span class="color-box" style="background: #d9f0d3;"></span> 2% a 6%</div>
+            <div class="legend-item"><span class="color-box" style="background: #a6d96a;"></span> 6% a 10%</div>
+            <div class="legend-item"><span class="color-box" style="background: #1a9641;"></span> &gt; 10%</div>
+        </div>
+
+        <div class="legend size-legend">
+            <h4>Precio (COP)</h4>
+            <div class="size-item">
+                <div class="circle" id="size-max"></div>
+                <span id="val-max">-</span>
+            </div>
+            <div class="size-item">
+                <div class="circle" id="size-med"></div>
+                <span id="val-med">-</span>
+            </div>
+            <div class="size-item">
+                <div class="circle" id="size-min"></div>
+                <span id="val-min">-</span>
+            </div>
+        </div>
+
+        <div id="info-container" class="info-container">
+            <button id="info-btn" class="info-btn" title="Información">ⓘ</button>
+            <div id="info-tooltip" class="info-tooltip">
+                <p><strong>Fuente:</strong> SIPSA (DANE)</p>
+                <p><strong>Precios:</strong> $/kg (excepto aceites/jugos: $/L, huevos: $/unidad)</p>
+                <p><strong>Mapa base:</strong> © CartoDB</p>
+                <p><strong>Mapa:</strong> MapLibre GL JS</p>
+                <p><strong>Desarrollado por:</strong> Bernardo Murgueitio</p>
+            </div>
+        </div>
     </div>
 
-    <div class="legend variation-legend">
-        <h4>Variación de Precio</h4>
-        <div class="legend-item"><span class="color-box" style="background:#b2182b"></span> &lt; -10%</div>
-        <div class="legend-item"><span class="color-box" style="background:#ef8a62"></span> -10% a -6%</div>
-        <div class="legend-item"><span class="color-box" style="background:#fddbc7"></span> -6% a -2%</div>
-        <div class="legend-item"><span class="color-box" style="background:#f5f5f5; border: 1px solid #ccc;"></span> -2% a 2%</div>
-        <div class="legend-item"><span class="color-box" style="background:#d9f0d3"></span> 2% a 6%</div>
-        <div class="legend-item"><span class="color-box" style="background:#a6d96a"></span> 6% a 10%</div>
-        <div class="legend-item"><span class="color-box" style="background:#1a9641"></span> &gt; 10%</div>
-    </div>
-
-    <div class="legend size-legend">
-        <h4>Precio (COP)</h4>
-        <div class="size-item">
-            <div class="circle" id="size-max"></div>
-            <span id="val-max"></span>
-        </div>
-        <div class="size-item">
-            <div class="circle" id="size-med"></div>
-            <span id="val-med"></span>
-        </div>
-        <div class="size-item">
-            <div class="circle" id="size-min"></div>
-            <span id="val-min"></span>
-        </div>
-    </div>
-
-    <script src="https://unpkg.com/maplibre-gl@3/dist/maplibre-gl.js"></script>    
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
     <script type="module" src="./js/components.js"></script>
     <script type="module" src="./js/app.js"></script>
 </body>
