@@ -1,0 +1,167 @@
+:root {
+    --header-bg: #2c3e50;
+    --text-dark: #333;
+    --border-gray: #ccc;
+    --focus-blue: #007bff;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    color: var(--text-dark);
+}
+
+header {
+    background-color: var(--header-bg);
+    color: white;
+    padding: 12px 24px;
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+header h1 { margin: 0; font-size: 1.2rem; font-weight: 500; }
+
+.controls {
+    display: flex;
+    gap: 20px;
+    padding: 15px 24px;
+    background: #fdfdfd;
+    border-bottom: 1px solid #eee;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    z-index: 5;
+}
+
+.dropdown-container { min-width: 200px; }
+
+#map-container {
+    flex-grow: 1;
+    position: relative;
+}
+
+#map { width: 100%; height: 100%; }
+
+.map-overlay {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    font-size: 1.1rem;
+    z-index: 10;
+}
+
+/* Dropdown Personalizado */
+.searchable-dropdown { position: relative; font-size: 14px; }
+
+.dropdown-header {
+    background: white;
+    border: 1px solid var(--border-gray);
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+}
+
+.dropdown-header:hover { border-color: #999; }
+.searchable-dropdown.open .dropdown-header { border-color: var(--focus-blue); }
+
+.dropdown-caret { font-size: 10px; color: #666; transition: transform 0.2s; }
+.searchable-dropdown.open .dropdown-caret { transform: rotate(180deg); }
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0; right: 0;
+    background: white;
+    border: 1px solid var(--border-gray);
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: none;
+    max-height: 250px;
+    flex-direction: column;
+    z-index: 100;
+}
+
+.searchable-dropdown.open .dropdown-menu { display: flex; }
+
+.dropdown-search-wrapper { padding: 8px; border-bottom: 1px solid #eee; flex-shrink: 0; }
+
+.dropdown-search-input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    outline: none;
+    font-size: 13px;
+    box-sizing: border-box;
+}
+.dropdown-search-input:focus { border-color: var(--focus-blue); }
+
+.dropdown-options {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+}
+
+.dropdown-options li {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #f5f5f5;
+}
+.dropdown-options li:hover { background: #f0f8ff; }
+.dropdown-options li.selected { background: #e6f2ff; font-weight: bold; }
+
+/* Leyendas */
+.legend {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 10px 15px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    font-size: 12px;
+    z-index: 5;
+}
+
+.variation-legend { bottom: 30px; right: 10px; }
+.size-legend { bottom: 30px; left: 10px; }
+
+.legend h4 { margin: 0 0 10px 0; font-size: 13px; color: #444; }
+
+.legend-item { display: flex; align-items: center; margin-bottom: 6px; }
+.color-box { width: 16px; height: 16px; margin-right: 8px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.1); }
+
+.size-item { display: flex; align-items: center; margin-bottom: 8px; }
+.size-item .circle {
+    background: rgba(100, 100, 100, 0.5);
+    border: 1px solid #555;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+/* Maplibre Popups Custom */
+.maplibregl-popup-content { padding: 12px 16px; border-radius: 6px; font-size: 13px; max-width: 220px; }
+.maplibregl-popup-close-button { font-size: 18px; padding: 2px 6px; color: #666; }
+.popup-title { font-weight: bold; font-size: 14px; margin-bottom: 6px; color: var(--header-bg); border-bottom: 1px solid #eee; padding-bottom: 4px; }
+.popup-row { display: flex; justify-content: space-between; margin-bottom: 2px; }
+.var-up { color: #1a9641; font-weight: bold; }
+.var-down { color: #b2182b; font-weight: bold; }
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .controls { flex-direction: column; gap: 10px; padding: 10px; }
+    .dropdown-container { width: 100%; min-width: auto; }
+    header h1 { font-size: 1rem; }
+    .legend { font-size: 11px; padding: 8px 10px; }
+    .variation-legend, .size-legend { bottom: 10px; }
+}

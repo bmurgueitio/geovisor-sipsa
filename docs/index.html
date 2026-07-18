@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌾 Geovisor de precios - Variación semanal</title>
+    <link href="https://unpkg.com/maplibre-gl@3/dist/maplibre-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>🌾 Geovisor de precios - Variación semanal</h1>
+    </header>
+
+    <div class="controls">
+        <div id="dropdown-grupo" class="dropdown-container"></div>
+        <div id="dropdown-subgrupo" class="dropdown-container"></div>
+        <div id="dropdown-producto" class="dropdown-container"></div>
+    </div>
+
+    <div id="map-container">
+        <div id="map"></div>
+        <div id="loading-message" class="map-overlay">Cargando datos...</div>
+        <div id="error-message" class="map-overlay" style="display: none;"></div>
+    </div>
+
+    <div class="legend variation-legend">
+        <h4>Variación de Precio</h4>
+        <div class="legend-item"><span class="color-box" style="background:#b2182b"></span> &lt; -10%</div>
+        <div class="legend-item"><span class="color-box" style="background:#ef8a62"></span> -10% a -6%</div>
+        <div class="legend-item"><span class="color-box" style="background:#fddbc7"></span> -6% a -2%</div>
+        <div class="legend-item"><span class="color-box" style="background:#f5f5f5; border: 1px solid #ccc;"></span> -2% a 2%</div>
+        <div class="legend-item"><span class="color-box" style="background:#d9f0d3"></span> 2% a 6%</div>
+        <div class="legend-item"><span class="color-box" style="background:#a6d96a"></span> 6% a 10%</div>
+        <div class="legend-item"><span class="color-box" style="background:#1a9641"></span> &gt; 10%</div>
+    </div>
+
+    <div class="legend size-legend">
+        <h4>Precio (COP)</h4>
+        <div class="size-item">
+            <div class="circle" id="size-max"></div>
+            <span id="val-max"></span>
+        </div>
+        <div class="size-item">
+            <div class="circle" id="size-med"></div>
+            <span id="val-med"></span>
+        </div>
+        <div class="size-item">
+            <div class="circle" id="size-min"></div>
+            <span id="val-min"></span>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/maplibre-gl@3/dist/maplibre-gl.js"></script>
+    <script type="module" src="js/components.js"></script>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
