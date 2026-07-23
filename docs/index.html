@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Geovisor de Precios Agrícolas</title>
+
     <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css">
     <link rel="stylesheet" href="./style.css">
 </head>
@@ -13,86 +14,138 @@
         <p id="subtitle">Seleccione un producto para ver su variación</p>
     </header>
 
-    <div class="controls">
+    <section class="controls">
         <div class="dropdown-container" id="dropdown-grupo"></div>
         <div class="dropdown-container" id="dropdown-subgrupo"></div>
         <div class="dropdown-container" id="dropdown-producto"></div>
-        <button id="filter-btn" class="filter-btn" title="Filtrar plazas">🔍 Filtrar</button>
-    </div>
 
-    <div id="dashboard" class="dashboard" style="display: none;">
+        <button id="city-filter-btn" class="filter-btn" type="button">
+            🏙️ Ciudades
+        </button>
+    </section>
+
+    <section id="dashboard" class="dashboard" style="display: none;">
         <div class="metric metric-avg">
-            <div class="metric-label">Precio Promedio</div>
-            <div class="metric-value" id="metric-avg-value">-</div>
+            <span class="metric-icon">💲</span>
+            <div class="metric-body">
+                <div class="metric-label">precio promedio</div>
+                <div class="metric-value" id="metric-avg-value">-</div>
+            </div>
         </div>
+
         <div class="metric metric-trend">
-            <div class="metric-label">Tendencia Semanal</div>
-            <div class="metric-value" id="metric-trend-value">-</div>
+            <span class="metric-icon">📈</span>
+            <div class="metric-body">
+                <div class="metric-label">tendencia semanal</div>
+                <div class="metric-value" id="metric-trend-value">-</div>
+            </div>
         </div>
+
         <div class="metric metric-max-up">
-            <div class="metric-label">Mayor Subida</div>
-            <div class="metric-value" id="metric-max-up-value">-</div>
+            <span class="metric-icon">⬆️</span>
+            <div class="metric-body">
+                <div class="metric-label">mayor subida</div>
+                <div class="metric-value" id="metric-max-up-value">-</div>
+            </div>
         </div>
+
         <div class="metric metric-max-down">
-            <div class="metric-label">Mayor Bajada</div>
-            <div class="metric-value" id="metric-max-down-value">-</div>
+            <span class="metric-icon">⬇️</span>
+            <div class="metric-body">
+                <div class="metric-label">mayor bajada</div>
+                <div class="metric-value" id="metric-max-down-value">-</div>
+            </div>
         </div>
+
         <div class="metric metric-min-price">
-            <div class="metric-label">Plaza Más Barata</div>
-            <div class="metric-value" id="metric-min-price-value">-</div>
+            <span class="metric-icon">🛒</span>
+            <div class="metric-body">
+                <div class="metric-label">plaza más barata</div>
+                <div class="metric-value" id="metric-min-price-value">-</div>
+            </div>
         </div>
+
         <div class="metric metric-max-price">
-            <div class="metric-label">Plaza Más Cara</div>
-            <div class="metric-value" id="metric-max-price-value">-</div>
+            <span class="metric-icon">💰</span>
+            <div class="metric-body">
+                <div class="metric-label">plaza más cara</div>
+                <div class="metric-value" id="metric-max-price-value">-</div>
+            </div>
         </div>
-    </div>
+    </section>
 
-    <div id="filter-panel" class="filter-panel" style="display: none;">
-        <div class="filter-header">
-            <h4>Filtrar Plazas</h4>
-            <button class="filter-close-btn" id="filter-close-btn">✕</button>
-        </div>
-        <div class="filter-actions">
-            <button id="select-all-btn" class="filter-action-btn">Seleccionar Todas</button>
-            <button id="deselect-all-btn" class="filter-action-btn">Deseleccionar Todas</button>
-        </div>
-        <div id="filter-checkboxes" class="filter-checkboxes"></div>
-    </div>
-
-    <div id="map-container">
+    <main id="map-container">
         <div id="map"></div>
-        <div id="loading-message" class="map-overlay">Cargando datos...</div>
-        <div id="error-message" class="map-overlay" style="display: none; color: #b2182b;"></div>
-        
+
+        <div id="loading-message" class="map-overlay">
+            Cargando datos...
+        </div>
+
+        <div id="error-message" class="map-overlay" style="display: none;"></div>
+
         <div class="legend variation-legend">
             <h4>Variación de Precio</h4>
-            <div class="legend-item"><span class="color-box" style="background: #b2182b;"></span> &lt; -10%</div>
-            <div class="legend-item"><span class="color-box" style="background: #ef8a62;"></span> -10% a -6%</div>
-            <div class="legend-item"><span class="color-box" style="background: #fddbc7;"></span> -6% a -2%</div>
-            <div class="legend-item"><span class="color-box" style="background: #f5f5f5;"></span> -2% a 2%</div>
-            <div class="legend-item"><span class="color-box" style="background: #d9f0d3;"></span> 2% a 6%</div>
-            <div class="legend-item"><span class="color-box" style="background: #a6d96a;"></span> 6% a 10%</div>
-            <div class="legend-item"><span class="color-box" style="background: #1a9641;"></span> &gt; 10%</div>
+
+            <div class="legend-item">
+                <span class="color-box" style="background: #b2182b;"></span>
+                &lt; -10%
+            </div>
+
+            <div class="legend-item">
+                <span class="color-box" style="background: #ef8a62;"></span>
+                -10% a -6%
+            </div>
+
+            <div class="legend-item">
+                <span class="color-box" style="background: #fddbc7;"></span>
+                -6% a -2%
+            </div>
+
+            <div class="legend-item">
+                <span class="color-box" style="background: #f5f5f5;"></span>
+                -2% a 2%
+            </div>
+
+            <div class="legend-item">
+                <span class="color-box" style="background: #d9f0d3;"></span>
+                2% a 6%
+            </div>
+
+            <div class="legend-item">
+                <span class="color-box" style="background: #a6d96a;"></span>
+                6% a 10%
+            </div>
+
+            <div class="legend-item">
+                <span class="color-box" style="background: #1a9641;"></span>
+                &gt; 10%
+            </div>
         </div>
 
         <div class="legend size-legend">
             <h4>Precio (COP)</h4>
+
             <div class="size-item">
-                <div class="circle" id="size-max"></div>
-                <span id="val-max">-</span>
+                <span class="circle" id="size-max"></span>
+                <span id="val-max">---</span>
             </div>
+
             <div class="size-item">
-                <div class="circle" id="size-med"></div>
-                <span id="val-med">-</span>
+                <span class="circle" id="size-med"></span>
+                <span id="val-med">---</span>
             </div>
+
             <div class="size-item">
-                <div class="circle" id="size-min"></div>
-                <span id="val-min">-</span>
+                <span class="circle" id="size-min"></span>
+                <span id="val-min">---</span>
             </div>
         </div>
 
-        <div id="info-container" class="info-container">
-            <button id="info-btn" class="info-btn" title="Información">ⓘ</button>
+        <div class="info-container" id="info-container">
+            <button id="info-btn" class="info-btn" type="button" aria-label="Información">
+                ⓘ
+            </button>
+
             <div id="info-tooltip" class="info-tooltip">
                 <p><strong>Fuente:</strong> SIPSA (DANE)</p>
                 <p><strong>Precios:</strong> $/kg (excepto aceites/jugos: $/L, huevos: $/unidad)</p>
@@ -101,10 +154,68 @@
                 <p><strong>Desarrollado por:</strong> Bernardo Murgueitio</p>
             </div>
         </div>
+    </main>
+
+    <aside id="filter-panel" class="filter-panel" style="display: none;" aria-label="Filtro de ciudades">
+        <div class="filter-header">
+            <h4>Ciudades</h4>
+            <button id="filter-close-btn" class="filter-close-btn" type="button" aria-label="Cerrar filtro">
+                ✕
+            </button>
+        </div>
+
+        <div class="filter-actions">
+            <button id="select-all-btn" class="filter-action-btn" type="button">
+                Seleccionar Todas
+            </button>
+            <button id="deselect-all-btn" class="filter-action-btn" type="button">
+                Deseleccionar Todas
+            </button>
+        </div>
+
+        <div id="filter-checkboxes" class="filter-checkboxes"></div>
+    </aside>
+
+    <div id="disclaimer-overlay" class="disclaimer-overlay" role="dialog" aria-modal="true" aria-labelledby="disclaimer-title">
+        <div class="disclaimer-modal">
+            <h3 id="disclaimer-title" class="disclaimer-title">
+                ⚠️ Limitaciones de los Datos
+            </h3>
+
+            <div class="disclaimer-text">
+                <p>
+                    La información presentada en este geovisor proviene del
+                    <strong>SIPSA (DANE)</strong> y corresponde a reportes semanales
+                    de precios mayoristas en plazas de mercado de Colombia.
+                </p>
+
+                <p>
+                    <strong>Los datos pueden presentar rezagos, omisiones, ajustes
+                    o variaciones</strong> entre las fechas de referencia. La disponibilidad
+                    de ciudades, plazas y productos puede cambiar semanalmente.
+                </p>
+
+                <p>
+                    Este visualizador tiene fines informativos y de análisis exploratorio.
+                    <strong>No constituye una fuente oficial para decisiones comerciales,
+                    contractuales o de política pública.</strong>
+                </p>
+            </div>
+
+            <div class="disclaimer-actions">
+                <label class="disclaimer-checkbox">
+                    <input type="checkbox" id="disclaimer-do-not-show">
+                    No volver a mostrar este mensaje
+                </label>
+
+                <button id="disclaimer-accept-btn" class="disclaimer-btn" type="button">
+                    Aceptar
+                </button>
+            </div>
+        </div>
     </div>
 
     <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
-    <script type="module" src="./js/components.js"></script>
     <script type="module" src="./js/app.js"></script>
 </body>
 </html>
