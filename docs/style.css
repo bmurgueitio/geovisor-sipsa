@@ -48,7 +48,7 @@ header h1 {
 .controls {
     display: flex;
     gap: 20px;
-    padding: 15px 24px;
+    padding: 10px 24px;
     background: #fdfdfd;
     border-bottom: 1px solid #eee;
     flex-shrink: 0;
@@ -87,7 +87,7 @@ header h1 {
 .dashboard {
     display: flex;
     gap: 15px;
-    padding: 15px 24px;
+    padding: 5px 24px;
     background: #f8f9fa;
     border-bottom: 1px solid #e0e0e0;
     flex-shrink: 0;
