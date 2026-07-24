@@ -83,98 +83,95 @@ header h1 {
 }
 
 /* Dashboard compacto: 6 métricas en una fila */
+/* Dashboard */
 .dashboard {
     display: flex;
-    flex-wrap: nowrap;
-    gap: 8px;
-    padding: 8px 16px;
-    background: #f5f6fa;
-    border-radius: 8px;
-    margin: 4px 12px;
-    overflow-x: auto;
+    gap: 15px;
+    padding: 15px 24px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
     flex-shrink: 0;
-    scrollbar-width: thin;
-}
-
-.dashboard::-webkit-scrollbar {
-    height: 8px;
-}
-
-.dashboard::-webkit-scrollbar-thumb {
-    background: #cfd4da;
-    border-radius: 8px;
+    flex-wrap: nowrap;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .metric {
-    background: #ffffff;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 10px 14px;
+    background: white;
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    padding: 6px 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    border-left: 4px solid var(--focus-blue);
     display: flex;
     align-items: center;
-    gap: 8px;
-    min-width: 120px;
-    flex: 0 0 auto;
-    border-left: 3px solid var(--focus-blue);
+    gap: 10px;
 }
 
 .metric-icon {
-    font-size: 1.2rem;
+    flex: 0 0 auto;
+    font-size: 18px;
     opacity: 0.7;
     line-height: 1;
-    flex-shrink: 0;
 }
 
-/* Compatibilidad con HTML previo (.metric-body) y nuevo (.metric-content) */
-.metric-content,
-.metric-body {
+.metric-body,
+.metric-content {
+    flex: 1 1 auto;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .metric-label {
-    font-size: 0.65rem;
+    font-size: 11px;
     color: #666;
-    text-transform: lowercase;
-    letter-spacing: 0.3px;
+    text-transform: capitalize;
+    letter-spacing: 0.5px;
     margin-bottom: 2px;
-    white-space: nowrap;
-}
-
-.metric-value {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #333;
-    line-height: 1.2;
-}
-
-.metric-value div {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.metric-avg {
-    border-left-color: #3498db;
+.metric-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-dark);
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    white-space: nowrap;
 }
 
-.metric-trend {
-    border-left-color: #1a9641;
+.metric-single {
+    flex: 0 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.metric-max-up {
-    border-left-color: #1a9641;
+.metric-place {
+    flex: 0 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.metric-max-down {
-    border-left-color: #b2182b;
+.metric-sep {
+    flex: 0 0 auto;
+    color: #999;
+    opacity: 0.7;
 }
 
-.metric-min-price {
-    border-left-color: #e67e22;
-}
-
-.metric-max-price {
-    border-left-color: #d35400;
+.metric-change {
+    flex: 0 0 auto;
+    white-space: nowrap;
 }
 
 /* Panel de filtro de ciudades */
@@ -497,7 +494,7 @@ header h1 {
 }
 
 .variation-legend {
-    bottom: 60px;
+    bottom: 90px;
     right: 10px;
 }
 
@@ -703,29 +700,7 @@ header h1 {
         font-size: 0.75rem;
     }
 
-    .dashboard {
-        flex-wrap: wrap;
-        overflow-x: visible;
-        margin: 4px 8px;
-        padding: 8px;
-    }
-
-    .metric {
-        flex: 1 1 calc(50% - 8px);
-        min-width: 120px;
-    }
-
-    .metric:nth-child(n+3) {
-        display: none;
-    }
-
-    .metric-label {
-        font-size: 9px;
-    }
-
-    .metric-value {
-        font-size: 13px;
-    }
+    
 
     .filter-panel {
         position: fixed;
@@ -787,5 +762,10 @@ header h1 {
 
     .disclaimer-btn {
         width: 100%;
+    }
+
+    #dashboard,
+    .dashboard {
+        display: none !important
     }
 }
