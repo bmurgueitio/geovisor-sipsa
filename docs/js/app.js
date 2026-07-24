@@ -57,6 +57,7 @@ class GeoVisor {
             this.extractCityData();
             this.buildCityFilter();
             this.initCityFilterButton();
+            this.initInfoButton();
 
             this.updateDropdownsFromFilteredData();
 
@@ -417,6 +418,39 @@ class GeoVisor {
         });
     }
 
+    initInfoButton() {
+        const infoBtn = document.getElementById('info-btn');
+        const infoTooltip = document.getElementById('info-tooltip');
+
+        if (!infoBtn || !infoTooltip) return;
+
+        infoBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            infoTooltip.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!infoTooltip.contains(e.target) && !infoBtn.contains(e.target)) {
+                infoTooltip.classList.remove('active');
+            }
+        });
+
+        // Hover solo en escritorio
+        if (window.innerWidth > 768) {
+            const container = document.getElementById('info-container');
+
+            infoBtn.addEventListener('mouseenter', () => {
+                infoTooltip.classList.add('active');
+            });
+
+            if (container) {
+                container.addEventListener('mouseleave', () => {
+                    infoTooltip.classList.remove('active');
+                });
+            }
+        }
+    }
+
     toggleCityFilterPanel() {
         const panel = document.getElementById('filter-panel');
         if (!panel) return;
@@ -472,15 +506,17 @@ class GeoVisor {
                 const newProductos = [];
 
                 (subgrupo.productos || []).forEach((producto) => {
-                    const plazasFiltradas = (producto.plazas || []).filter((plaza) => {
+                    const debeIncluirse = (producto.plazas || []).some((plaza) => {
                         const key = `${plaza.departamento}::${plaza.ciudad}`;
-                        return selectedCities.has(key);
+
+                        // Compatibilidad con selección por key interna y/o nombre de ciudad
+                        return selectedCities.has(key) || selectedCities.has(plaza.ciudad);
                     });
 
-                    if (plazasFiltradas.length > 0) {
+                    if (debeIncluirse) {
                         newProductos.push({
                             ...producto,
-                            plazas: plazasFiltradas
+                            plazas: [...(producto.plazas || [])]
                         });
                     }
                 });
