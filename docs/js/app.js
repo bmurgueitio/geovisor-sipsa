@@ -671,85 +671,93 @@ class GeoVisor {
 
         dashboard.style.display = 'flex';
 
+        const plazaLabel = (p) => {
+            if (!p) return '';
+
+            if (p.nombre_fuente) return p.nombre_fuente;
+
+            const ciudad = p.ciudad || '';
+            const departamento = p.departamento ? ` (${p.departamento})` : '';
+
+            return `${ciudad}${departamento}`.trim() || '—';
+        };
+
+        const fmtPct = (valor) => {
+            const v = this.safeNumber(valor);
+            const sign = v >= 0 ? '+' : '';
+            return `${sign}${v.toFixed(1)}%`;
+        };
+
+        // Precio promedio
         const avgPrecio = plazas.reduce(
             (sum, p) => sum + this.safeNumber(p.precio_reciente),
             0
         ) / plazas.length;
 
-        document.getElementById('metric-avg-value').textContent =
-            this.formatCOP(avgPrecio);
+        document.getElementById('metric-avg-value').innerHTML =
+            `<span class="metric-single">${this.formatCOP(avgPrecio)}</span>`;
 
+        // Tendencia semanal
         const avgVariacion = plazas.reduce(
             (sum, p) => sum + this.safeNumber(p.variacion_pct),
             0
         ) / plazas.length;
 
         const trendArrow = this.getArrow(avgVariacion);
-        const trendSign = avgVariacion >= 0 ? '+' : '';
         const trendColor = avgVariacion >= 0 ? '#1a9641' : '#b2182b';
 
         document.getElementById('metric-trend-value').innerHTML =
-            `<span style="color: ${trendColor};">
-                ${trendArrow} ${trendSign}${avgVariacion.toFixed(1)}%
-            </span>`;
+            `<span class="metric-single" style="color: ${trendColor};">${trendArrow} ${fmtPct(avgVariacion)}</span>`;
 
+        // Mayor subida
         const maxSubida = plazas.reduce(
             (max, p) => this.safeNumber(p.variacion_pct) > this.safeNumber(max.variacion_pct) ? p : max,
             plazas[0]
         );
 
         const subidaVal = this.safeNumber(maxSubida.variacion_pct);
-        const subidaSign = subidaVal >= 0 ? '+' : '';
         const subidaColor = subidaVal >= 0 ? '#1a9641' : '#b2182b';
-        const subidaArrow = this.getArrow(subidaVal);
 
-        document.getElementById('metric-max-up-value').innerHTML = `
-            <div style="font-size: 12px;">${maxSubida.nombre_fuente}</div>
-            <div style="color: ${subidaColor}; font-size: 14px;">
-                ${subidaArrow} ${subidaSign}${subidaVal.toFixed(1)}%
-            </div>
-        `;
+        document.getElementById('metric-max-up-value').innerHTML =
+            `<span class="metric-place">${plazaLabel(maxSubida)}</span>` +
+            `<span class="metric-sep">→</span>` +
+            `<span class="metric-change" style="color: ${subidaColor};">${fmtPct(subidaVal)}</span>`;
 
+        // Mayor bajada
         const maxBajada = plazas.reduce(
             (min, p) => this.safeNumber(p.variacion_pct) < this.safeNumber(min.variacion_pct) ? p : min,
             plazas[0]
         );
 
         const bajadaVal = this.safeNumber(maxBajada.variacion_pct);
-        const bajadaSign = bajadaVal >= 0 ? '+' : '';
         const bajadaColor = bajadaVal >= 0 ? '#1a9641' : '#b2182b';
-        const bajadaArrow = this.getArrow(bajadaVal);
 
-        document.getElementById('metric-max-down-value').innerHTML = `
-            <div style="font-size: 12px;">${maxBajada.nombre_fuente}</div>
-            <div style="color: ${bajadaColor}; font-size: 14px;">
-                ${bajadaArrow} ${bajadaSign}${bajadaVal.toFixed(1)}%
-            </div>
-        `;
+        document.getElementById('metric-max-down-value').innerHTML =
+            `<span class="metric-place">${plazaLabel(maxBajada)}</span>` +
+            `<span class="metric-sep">→</span>` +
+            `<span class="metric-change" style="color: ${bajadaColor};">${fmtPct(bajadaVal)}</span>`;
 
+        // Plaza más barata
         const masBarata = plazas.reduce(
             (min, p) => this.safeNumber(p.precio_reciente) < this.safeNumber(min.precio_reciente) ? p : min,
             plazas[0]
         );
 
-        document.getElementById('metric-min-price-value').innerHTML = `
-            <div style="font-size: 12px;">${masBarata.nombre_fuente}</div>
-            <div style="color: #e67e22; font-size: 14px;">
-                ${this.formatCOP(this.safeNumber(masBarata.precio_reciente))}
-            </div>
-        `;
+        document.getElementById('metric-min-price-value').innerHTML =
+            `<span class="metric-place">${plazaLabel(masBarata)}</span>` +
+            `<span class="metric-sep">→</span>` +
+            `<span class="metric-change" style="color: #e67e22;">${this.formatCOP(this.safeNumber(masBarata.precio_reciente))}</span>`;
 
+        // Plaza más cara
         const masCara = plazas.reduce(
             (max, p) => this.safeNumber(p.precio_reciente) > this.safeNumber(max.precio_reciente) ? p : max,
             plazas[0]
         );
 
-        document.getElementById('metric-max-price-value').innerHTML = `
-            <div style="font-size: 12px;">${masCara.nombre_fuente}</div>
-            <div style="color: #d35400; font-size: 14px;">
-                ${this.formatCOP(this.safeNumber(masCara.precio_reciente))}
-            </div>
-        `;
+        document.getElementById('metric-max-price-value').innerHTML =
+            `<span class="metric-place">${plazaLabel(masCara)}</span>` +
+            `<span class="metric-sep">→</span>` +
+            `<span class="metric-change" style="color: #d35400;">${this.formatCOP(this.safeNumber(masCara.precio_reciente))}</span>`;
     }
 
     hideDashboard() {
